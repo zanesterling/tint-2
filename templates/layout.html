@@ -1,0 +1,11 @@
+<html>
+<head>
+  <link rel=stylesheet
+        href='{{ url_for('static', filename='css/globals.css' }}'>
+
+  {% block includes %}{% endblock %} 
+</head>
+<body>
+  {% block body %}{% endblock %}
+</body>
+</html>
