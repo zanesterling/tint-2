@@ -1,5 +1,7 @@
 <html>
 <head>
+  <title>Tint</title>
+
   <link rel=stylesheet
         href='{{ url_for('static', filename='css/globals.css') }}'>
 
@@ -7,6 +9,10 @@
 </head>
 <body>
   <div class='page'>
+    {% for msg in get_flashed_messages() %}
+      {{ msg }}<br>
+    {% endfor %}
+    <br>
   	{% block body %}{% endblock %}
   </div>
 </body>
