@@ -1,3 +1,4 @@
+#!/usr/local/bin/python
 from flask import Flask, render_template, redirect, url_for, flash, \
 	session
 from flask.ext.github import GitHub
@@ -14,16 +15,28 @@ github = GitHub(app)
 
 @app.route('/')
 def home():
-	return render_template('home.html')
+	if 'usern' not in session:
+		return render_template('home.html')
+
+	d = {}
+	d['usern'] = session['usern']
+	d['repos'] = github.get('user/repos')
+	return render_template('dashboard.html', d=d)
 
 @app.route('/login')
 def login():
 	# if the user is already logged in, send them away
-	if 'username' in session:
+	if 'usern' in session:
 		return redirect(url_for('home'))
 
 	# forward to github's oauth system
 	return github.authorize()
+
+@app.route('/logout')
+def logout():
+	session.pop('usern', None)
+	flash('You were logged out')
+	return redirect(url_for('home'))
 
 @app.route('/github-callback')
 @github.authorized_handler
@@ -40,7 +53,7 @@ def gh_callback(oauth_token):
 	usern = db.getUser(oauth_token)['usern']
 
 	# give them a cookie (or refresh theirs) that says logged-in
-	session['username'] = usern
+	session['usern'] = usern
 
 	# send them to the dashboard
 	flash('You were logged in')
@@ -49,6 +62,11 @@ def gh_callback(oauth_token):
 # TODO add proper error logging
 def log(logstr):
 	print logstr
+
+@github.access_token_getter
+def token_getter():
+	if 'usern' in session:
+		return db.getUser(usern=session['usern'])['token']
 
 if __name__=='__main__':
 	app.run('0.0.0.0', 9000, debug=True)

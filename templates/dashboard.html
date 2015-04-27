@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block body %}
+  Yo {{ d['usern'] }}-dawg<br>
+  <br>
+
+  <b>Your repos</b><br>
+  {% for repo in d['repos'] %}
+    <a href={{ repo['html_url'] }}>{{ repo['name'] }}</a><br>
+  {% endfor %}
+  <br>
+
+  <a href='/logout'><b>Log out</b></a>
+{% endblock %}

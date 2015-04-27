@@ -24,5 +24,8 @@ def addUser(oauth_token):
 	db.users.insert(user)
 	return usern
 
-def getUser(oauth_token):
-	return db.users.find_one({'token': oauth_token})
+def getUser(oauth_token=None, usern=None):
+	if oauth_token is not None:
+		return db.users.find_one({'token': oauth_token})
+	if usern is not None:
+		return db.users.find_one({'usern': usern})
