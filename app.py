@@ -35,9 +35,9 @@ def gh_callback(oauth_token):
 		return redirect(url_for('home'))
 
 	# if the user is new register them with the db
-	usern = db.hasUser(oauth_token)
-	if not usern:
-		usern = db.addUser(oauth_token)
+	if not db.hasUser(oauth_token):
+		db.addUser(oauth_token)
+	usern = db.getUser(oauth_token)['usern']
 
 	# give them a cookie (or refresh theirs) that says logged-in
 	session['username'] = usern
