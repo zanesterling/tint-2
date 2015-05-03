@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 from flask import Flask, render_template, redirect, url_for, flash, \
-	session
+	session, request
 from flask.ext.github import GitHub
 
 import db
@@ -16,6 +16,10 @@ github = GitHub(app)
 @app.route('/')
 def home():
 	if 'usern' not in session:
+		return render_template('home.html')
+	user = db.getUser(usern=session['usern'])
+	if not user:
+		session.pop('usern', None)
 		return render_template('home.html')
 
 	d = {}
@@ -58,6 +62,28 @@ def gh_callback(oauth_token):
 	# send them to the dashboard
 	flash('You were logged in')
 	return redirect(url_for('home'))
+
+@app.route('/action', methods=['POST'])
+def action():
+	if 'usern' not in session:
+		return 'err: you aren\'t authorized'
+
+	data = request.form
+	if not data:
+		return 'err: bad data'
+	if 'action' not in data:
+		return 'err: action not recognized'
+
+	if data['action'] == 'toggle-repo':
+		user = db.getUser(usern=session['usern'])
+		if data['repo'] in user['tinted-repos']:
+			user['tinted-repos'].remove(data['repo'])
+		else:
+			user['tinted-repos'].append(data['repo'])
+		db.overwriteUser(user)
+		return 'success'
+
+	return 'err: action not recognized'
 
 # TODO add proper error logging
 def log(logstr):

@@ -1,13 +1,24 @@
 {% extends 'layout.html' %}
+{% block includes %}
+  <script src=//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js>
+  </script>
+  <script src=/static/js/dashboard.js></script>
+
+  <style href='/static/css/dashboard.css'></style>
+{% endblock %}
 {% block body %}
+  <div id='auth-token' class='hidden'>{{ d['token'] }}</div>
+
   Yo {{ d['usern'] }}-dawg<br>
   <br>
 
   <b>Your repos</b><br>
-  {% for repo in d['repos'] %}
-    <a href={{ repo['html_url'] }}>{{ repo['name'] }}</a><br>
-  {% endfor %}
-  <br>
+  <div id=repos>
+    {% for repo in d['repos'] %}
+      <button>{{ repo['name'] }}</button><br>
+    {% endfor %}
+    <br>
+  </div>
 
   <a href='/logout'><b>Log out</b></a>
 {% endblock %}
