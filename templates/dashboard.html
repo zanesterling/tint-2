@@ -4,7 +4,7 @@
   </script>
   <script src=/static/js/dashboard.js></script>
 
-  <style href='/static/css/dashboard.css'></style>
+  <link rel=stylesheet href='/static/css/dashboard.css'></style>
 {% endblock %}
 {% block body %}
   <div id='auth-token' class='hidden'>{{ d['token'] }}</div>
@@ -15,7 +15,7 @@
   <b>Your repos</b><br>
   <div id=repos>
     {% for repo in d['repos'] %}
-      <button>{{ repo['name'] }}</button><br>
+      <button class=untinted>{{ repo['name'] }}</button><br>
     {% endfor %}
     <br>
   </div>
