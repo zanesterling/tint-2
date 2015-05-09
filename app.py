@@ -5,6 +5,7 @@ from flask.ext.github import GitHub
 
 import db
 import secrets
+import utils
 
 app = Flask(__name__)
 app.config['GITHUB_CLIENT_ID'] = secrets.CLIENT_ID
@@ -48,7 +49,7 @@ def gh_callback(oauth_token):
 	# ensure we got the token
 	if oauth_token is None:
 		flash('There was an issue logging in')
-		log('err: login error')
+		utils.log('err: login error')
 		return redirect(url_for('home'))
 
 	# if the user is new register them with the db
@@ -68,26 +69,34 @@ def action():
 	if 'usern' not in session:
 		return 'err: you aren\'t authorized'
 
-	data = request.form
-	if not data:
-		return 'err: bad data'
-	if 'action' not in data:
+	form = request.form
+	if not form:
+		return 'err: bad form'
+	if 'action' not in form:
 		return 'err: action not recognized'
 
-	if data['action'] == 'toggle-repo':
+	if form['action'] == 'toggle-repo':
 		user = db.getUser(usern=session['usern'])
-		if data['repo'] in user['tinted-repos']:
-			user['tinted-repos'].remove(data['repo'])
+
+		# toggle the tint-state
+		if form['repo'] in user['tinted-repos']:
+			utils.untint(user, form['repo'])
+			user['tinted-repos'].remove(form['repo'])
 		else:
-			user['tinted-repos'].append(data['repo'])
+			utils.tint(user, form['repo'])
+			user['tinted-repos'].append(form['repo'])
+
+		# update user in the db
 		db.overwriteUser(user)
 		return 'success'
+	elif form['action'] == 'get-repo-state':
+		user = db.getUser(usern=session['usern'])
+		if form['repo'] in user['tinted-repos']:
+			return 'tinted'
+		else:
+			return 'untinted'
 
 	return 'err: action not recognized'
-
-# TODO add proper error logging
-def log(logstr):
-	print logstr
 
 @github.access_token_getter
 def token_getter():
