@@ -79,16 +79,19 @@ def action():
 		user = db.getUser(usern=session['usern'])
 
 		# toggle the tint-state
+		newState = None
 		if form['repo'] in user['tinted-repos']:
 			utils.untint(user, form['repo'])
 			user['tinted-repos'].remove(form['repo'])
+			newState = 'untinted'
 		else:
 			utils.tint(user, form['repo'])
 			user['tinted-repos'].append(form['repo'])
+			newState = 'tinted'
 
 		# update user in the db
 		db.overwriteUser(user)
-		return 'success'
+		return newState
 	elif form['action'] == 'get-repo-state':
 		user = db.getUser(usern=session['usern'])
 		if form['repo'] in user['tinted-repos']:

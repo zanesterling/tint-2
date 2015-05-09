@@ -1,6 +1,6 @@
 $(function() {
 	var BTN_UNTINTED = 'rgb(20, 100, 250)';
-	var BTN_TINTING = 'rgb(250, 250, 0)';
+	var BTN_TOGGLING = 'rgb(250, 250, 0)';
 	var BTN_TINTED = 'rgb(80, 220, 80)';
 
 	$('#repos').find('button').each(function(index, button) {
@@ -11,7 +11,7 @@ $(function() {
 
 		// when clicked, ping server and change color to yellow
 		btn.click(function(event) {
-			btn.css('background-color', BTN_TINTING);
+			btn.css('background-color', BTN_TOGGLING);
 			btn.css('color', 'black');
 
 			$.post('/action', {
@@ -19,7 +19,13 @@ $(function() {
 				'repo': btn.text()
 			}, function(reply) {
 				// when the server gets back to us, set color to green
-				btn.css('background-color', BTN_TINTED);
+				if (reply == 'tinted') {
+					btn.css('background-color', BTN_TINTED);
+					btn.css('color', 'black');
+				} else if (reply == 'untinted') {
+					btn.css('background-color', BTN_UNTINTED);
+					btn.css('color', 'white');
+				}
 			});
 		});
 
